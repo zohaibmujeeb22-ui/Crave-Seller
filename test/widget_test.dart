@@ -9,9 +9,9 @@ import 'package:crave_seller/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('app loads home screen', (WidgetTester tester) async {
+  testWidgets('app loads login screen', (WidgetTester tester) async {
     await tester.pumpWidget(const CraveSellerApp());
 
-    expect(find.text('Crave Seller'), findsOneWidget);
+    expect(find.text('CRAVE'), findsOneWidget);
   });
 }

@@ -1,5 +1,13 @@
+import 'package:crave_seller/core/auth_service.dart/auth_service.dart';
+import 'package:crave_seller/core/auth_service.dart/database_service.dart';
+import 'package:crave_seller/core/constants/app_constants.dart';
+import 'package:crave_seller/features/auth/screens/login_screen.dart';
+import 'package:crave_seller/providers/auth_provider.dart';
+import 'package:crave_seller/providers/onboarding_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +24,11 @@ Future<void> main() async {
     ),
   );
 
+  await Supabase.initialize(
+    url: AppConstants.supabaseUrl,
+    publishableKey: AppConstants.supabaseAnonKey,
+  );
+
   runApp(const CraveSellerApp());
 }
 
@@ -24,11 +37,30 @@ class CraveSellerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Crave Seller',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.deepOrange),
-      home: const Scaffold(body: Center(child: Text('Crave Seller'))),
+    final authService = AuthService();
+    final databaseService = DatabaseService();
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CraveAuthProvider(
+            authService: authService,
+            dbService: databaseService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => OnboardingProvider(dbService: databaseService),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Crave Seller',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: Colors.deepOrange,
+        ),
+        home: const LoginScreen(),
+      ),
     );
   }
 }
